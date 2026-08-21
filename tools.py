@@ -1,3 +1,10 @@
+def get_weather(city):
+    return f"{city}今天多云转雷阵雨，气温 25℃，东风 2 级"
+
+def calculate(expression):
+    result = eval(expression)
+    return str(result)
+
 tools = [
     {
         "type":"function",
@@ -20,13 +27,13 @@ tools = [
         "type": "function",
         "function": {
             "name": "calculate",
-            "description": "计算数学表达式",  # 功能描述（LLM 用来判断何时调）
+            "description": "使用eval()计算数学表达式",  # 功能描述（LLM 用来判断何时调）
             "parameters": {  # 第三层：JSON Schema 描述参数
                 "type": "object",
                 "properties": {
                     "expression": {
                         "type": "string",
-                        "description": "表达式"
+                        "description": "满足eval()的表达式"
                     }
                 },
                 "required": ["expression"]  # 哪些参数必填
@@ -34,3 +41,8 @@ tools = [
         }
     }
 ]
+
+Tool_Map = {
+    "get_weather": get_weather,
+    "calculate": calculate
+}

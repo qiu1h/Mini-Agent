@@ -10,15 +10,16 @@ class ZhipuLLM:
         self.client = ZhipuAiClient(api_key=os.getenv("ZAI_API_KEY"))
     def generate(self, messages,tools=None):
         response = self.client.chat.completions.create(
-            model="glm-4.7",
+            model="glm-5.1",
             messages=[
                 {"role": "system", "content": "你是邱一航的全能助手，你的回答要尽可能简洁。"},
                 *messages
             ],
             tools=tools,
             thinking={
-                "type": "enabled",  # 启用深度思考模式
+                "type": "disabled",  # 启用深度思考模式
             },
+            reasoning_effort="low",
             max_tokens=65536,  # 最大输出 tokens
             temperature=1.0  # 控制输出的随机性
         )

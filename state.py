@@ -2,7 +2,7 @@ class AgentState:
     def __init__(self):
         self.messages = []
         self.step_count = 0
-        self.max_steps = 3
+        self.max_steps = 10
 
     def state(self):
         return self.messages, self.step_count, self.max_steps
@@ -10,3 +10,7 @@ class AgentState:
     def update(self, messages, step_count):
         self.messages = messages
         self.step_count = step_count
+
+    def reset(self):
+        self.messages = []
+        self.step_count = 0
