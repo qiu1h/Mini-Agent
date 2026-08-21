@@ -33,6 +33,7 @@ class AgentRuntime:
                         }
                     }for tc in response.tool_calls
                 ]
+                print(tool_calls_list)
                 messages.append({"role": "assistant", "content": response.content, "tool_calls":tool_calls_list})
                 self.state.update(messages, step_count)
                 for tool_call in response.tool_calls:
