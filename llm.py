@@ -7,7 +7,7 @@ class ZhipuLLM:
         # 从 .env 文件加载环境变量
         load_dotenv()
         # 从环境变量读取 API Key，不再硬编码在代码里
-        self.client = ZhipuAiClient(api_key=os.getenv("ZAI_API_KEY"))
+        self.client = ZhipuAiClient(api_key=os.getenv("ZAI_API_KEY"),timeout=60)
     def generate(self, messages,tools=None):
         response = self.client.chat.completions.create(
             model="glm-5.1",

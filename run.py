@@ -1,3 +1,5 @@
+import time
+
 from tools import tools
 from llm import ZhipuLLM
 from state import AgentState
@@ -15,7 +17,16 @@ class AgentRuntime:
         while True:
             step_count += 1
             # print(f"State{step_count}:", state.state())
-            response = self.llm.generate(messages,tools)
+            for attempt in range(4):
+                try:
+                    response = self.llm.generate(messages, tools)
+                    break
+                except Exception as e:
+                    print(f"LLM调用失败，正在进行第{attempt+1}/3次重试 \t {e}")
+                    time.sleep(2 ** attempt)
+            else:
+                print("重试全部失败，放弃本任务")
+                return None
 
             if not response.tool_calls:
                 messages.append({"role": "assistant", "content": response.content})
@@ -33,12 +44,15 @@ class AgentRuntime:
                         }
                     }for tc in response.tool_calls
                 ]
-                print(tool_calls_list)
+                # print(tool_calls_list)
                 messages.append({"role": "assistant", "content": response.content, "tool_calls":tool_calls_list})
                 self.state.update(messages, step_count)
                 for tool_call in response.tool_calls:
                     # print(tool_call.function.name, tool_call.function.arguments)
-                    tool_output = executor(tool_call.function.name, tool_call.function.arguments)
+                    try:
+                        tool_output = executor(tool_call.function.name, tool_call.function.arguments)
+                    except Exception as e:
+                        tool_output = f"工具调用失败:{e}"
                     # print(tool_output)
                     messages.append({"role": "tool", "tool_call_id": tool_call.id,"content": tool_output})
 
@@ -53,7 +67,10 @@ if __name__ == '__main__':
         agent = AgentRuntime(state)
         task = input("User:")
         response = agent.run(task)
+        if response==None:
+            print("全部重试都失败!")
+            continue
         print("Agent:",response.content)
         # print("raw response:",response)
-        # print("State:",state.state())
+        print("State:",state.state())
 
